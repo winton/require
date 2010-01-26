@@ -51,8 +51,9 @@ class Dep
           s.send "#{option}=", Dep.gemspec.get(option, 0) || defaults[option]
         end
         
-        Dep.profile.get(:gemspec).each do |(version, options, children)|
-          s.add_dependency(name, version || Dep.gem.get(name, 0))
+        version, options, children = Dep.profile.get(:gemspec)
+        children.each do |name, (overwrite_version, merge_options)|
+          s.add_dependency(name.to_s, overwrite_version || Dep.gem.get(name, 0))
         end
       end
     end

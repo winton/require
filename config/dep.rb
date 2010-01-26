@@ -14,7 +14,7 @@ Dep.gemspec do
   homepage "http://github.com/winton/#{name}"
   root File.expand_path("#{File.dirname(__FILE__)}/../")
   summary "Dependency manager"
-  version '0.1.0'
+  version '0.1.1'
 end
 
 Dep.profile do
