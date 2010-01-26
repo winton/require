@@ -10,7 +10,7 @@ class Dep
       if index
         self[key][index] rescue nil
       else
-        self[key] || []
+        self[key] || [ nil, {}, {} ]
       end
     end
 

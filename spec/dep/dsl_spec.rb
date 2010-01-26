@@ -39,7 +39,7 @@ class Dep
       dsl.call { a 1 }
       dsl.get(:a).should == [ 1, {}, {} ]
       dsl.get(:a, 0).should == 1
-      dsl.get(:fail).should == []
+      dsl.get(:fail).should == [ nil, {}, {} ]
     end
   end
 end
