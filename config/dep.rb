@@ -24,5 +24,5 @@ Dep.profile do
     rspec :require => %w(spec/rake/spectask)
   end
   
-  spec_helper :require => %w(lib/dep pp)
+  spec_helper :require => %w(lib/dep/spec_helper lib/dep pp)
 end
