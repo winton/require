@@ -8,7 +8,7 @@ class Dep
   @@gemspec = Gemspec.new
   
   def self.call(&block)
-    @@dsl.call &block
+    @@dsl.call(&block) if block_given?
   end
   
   def self.instance
@@ -43,6 +43,12 @@ class Dep
     else
       raise "Dep##{method} does not exist"
     end
+  end
+  
+  def self.reset(&block)
+    @@dsl = Dsl.new
+    @@gemspec = Gemspec.new
+    call &block
   end
   
   def self.root

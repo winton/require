@@ -4,7 +4,7 @@ class Dep
   describe Gemspec do
     
     it "should generate a valid gemspec instance" do
-      Dep do
+      Dep.reset do
         gem :rspec, '=1.3.0'
       
         gemspec do

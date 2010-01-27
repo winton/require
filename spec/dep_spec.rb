@@ -3,7 +3,7 @@ require "#{File.dirname(__FILE__)}/spec_helper"
 describe Dep do
   
   before(:all) do
-    Dep do
+    Dep.reset do
       gem :rake, '=0.8.7'
       gem(:rspec, '=1.3.0') { require 'spec' }
       

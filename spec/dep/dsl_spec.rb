@@ -52,40 +52,9 @@ class Dep
         end
       end
       dsl.all(:a).should == [[:a, 1], [:a, 2, [[:b, 3], [:b, 4]]]]
+      dsl.all(:a, 1).should == [[:a, 1]]
       dsl.all(:b).should == []
-      dsl.all(:a).all(:b).should == [[:b, 3], [:b, 4]]
-    end
-    
-    it "should" do
-      Dep do
-        gem :active_wrapper, '=0.2.3' do
-          require :active_wrapper
-        end
-        
-        gemspec do
-          author 'Winton Welsh'
-          email 'mail@wintoni.us'
-          dependencies do
-            gem :active_wrapper
-          end
-          name 'gem_template'
-          homepage "http://github.com/winton/#{name}"
-          root File.expand_path("#{File.dirname(__FILE__)}/../")
-          summary ""
-          version '0.1.0'
-        end
-        
-        bin do
-          require 'lib/gem_template'
-          gem :active_wrapper do
-            require 'something'
-          end
-        end
-      end
-      Dep.class_eval do
-        debug @@dsl
-      end
-      
+      dsl.all(:a).last.all(:b).should == [[:b, 3], [:b, 4]]
     end
   end
 end
