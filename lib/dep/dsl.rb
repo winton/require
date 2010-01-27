@@ -1,30 +1,76 @@
 class Dep
-  class Dsl < Hash
-
+  class Dsl < Array
+    
+    def all(*values)
+      if values.empty?
+        self
+      else
+        Dsl.new(self.select { |a| a[0..values.length-1] == values })
+      end
+    end
+    
     def call(&block)
       instance_eval(&block) if block_given?
       self
     end
     
-    def get(key, index=nil)
-      if index
-        self[key][index] rescue nil
+    def get(*values)
+      self.detect { |a| a[0..values.length-1] == values }
+    end
+    
+    def gem(*args, &block)
+      args.unshift(:gem)
+      method_missing *args, &block
+    end
+    
+    def method_missing(*args, &block)
+      if args.length == 1 && a = self.get(args[0])
+        a[1]
       else
-        self[key] || [ nil, {}, {} ]
+        if block_given?
+          args << Dsl.new.call(&block)
+        end
+        self << Args.new(args)
       end
     end
-
-    def method_missing(method, *args, &block)
-      value = args.detect { |a| a.class != Hash }
-      options = args.detect { |a| a.class == Hash }
-      if self[method] && value.nil? && options.nil?
-        self.get(method, 0)
-      else
-        self[method] = [
-          value,
-          options || {},
-          block_given? ? Dsl.new.call(&block) : {}
-        ]
+    
+    def require(*args, &block)
+      args.unshift(:require)
+      method_missing *args, &block
+    end
+    
+    class Args < Array
+      
+      def all(*values)
+        dsl.all(*values) if dsl
+      end
+      
+      def dsl
+        self[-1] if self[-1].class == Dep::Dsl::Args || self[-1].class == Dsl
+      end
+      
+      def get(*values)
+        dsl.get(*values) if dsl
+      end
+      
+      def gem?
+        self[0] == :gem
+      end
+      
+      def name
+        self[1] if gem? && self[1] != dsl
+      end
+      
+      def path
+        self[1] if require? && self[1] != dsl
+      end
+      
+      def require?
+        self[0] == :require
+      end
+      
+      def version
+        self[2] if self[0] == :gem && self[2] != dsl
       end
     end
   end

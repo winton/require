@@ -1,28 +1,29 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../lib/dep")
 
-Dep.gem do
+Dep do
   
-  rake '=0.8.7', :require => %w(rake)
-  rspec '=1.3.0'
-end
-
-Dep.gemspec do
-
-  author 'Winton Welsh'
-  email 'mail@wintoni.us'
-  name 'dep'
-  homepage "http://github.com/winton/#{name}"
-  root File.expand_path("#{File.dirname(__FILE__)}/../")
-  summary "Dependency manager"
-  version '0.1.1'
-end
-
-Dep.profile do
+  gem(:rake, '=0.8.7') { require 'rake' }
+  gem(:rspec, '=1.3.0') { require 'rspec' }
   
-  rakefile :require => %w(lib/dep/tasks) do
-    rake :require => %w(rake/gempackagetask)
-    rspec :require => %w(spec/rake/spectask)
+  gemspec do
+    author 'Winton Welsh'
+    email 'mail@wintoni.us'
+    name 'dep'
+    homepage "http://github.com/winton/#{name}"
+    root File.expand_path("#{File.dirname(__FILE__)}/../")
+    summary "Dependency manager"
+    version '0.1.2'
   end
   
-  spec_helper :require => %w(lib/dep/spec_helper lib/dep pp)
+  rakefile do
+    gem(:rake) { require 'rake/gempackagetask' }
+    gem(:rspec) { require 'spec/rake/spectask' }
+    require 'lib/dep/tasks'
+  end
+  
+  spec_helper do
+    require 'lib/dep/spec_helper'
+    require 'lib/dep'
+    require 'pp'
+  end
 end

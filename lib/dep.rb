@@ -4,51 +4,49 @@ require "#{File.dirname(__FILE__)}/dep/gemspec"
 
 class Dep
   
-  @@gem = Dsl.new
-  @@gemspec = Dsl.new
-  @@gemspec_instance = Gemspec.new
-  @@profile = Dsl.new
+  @@dsl = Dsl.new
+  @@gemspec = Gemspec.new
   
-  def self.gem(&block)
-    @@gem.call &block
+  def self.call(&block)
+    @@dsl.call &block
   end
   
-  def self.gemspec(&block)
-    @@gemspec.call &block
+  def self.instance
+    @@gemspec.instance
   end
   
-  def self.gemspec_instance
-    @@gemspec_instance.instance
+  def self.get(*args)
+    @@dsl.get *args
   end
   
   def self.name
-    @@gemspec_instance.name
+    @@gemspec.name
   end
   
   def self.method_missing(method, value=nil, options=nil)
     method = method.to_s
     if method.include?('!')
       method = method.gsub!('!', '').intern
-      if profile[method]
-        version, options, children = profile[method]
-        children.each do |name, (overwrite_version, merge_options)|
-          require_gem! name, overwrite_version, merge_options
+      gem = get(:gem, method)
+      profile = get(method)
+      if profile
+        profile.dsl.each do |dsl|
+          if dsl.require?
+            require! dsl.path
+          elsif dsl.gem?
+            require_gem! dsl.name, dsl.version, dsl.dsl
+          end
         end
-        require! options[:require]
-      elsif gem[method]
-        require_gem! method
+      elsif gem
+        require_gem! gem.name
       end
     else
       raise "Dep##{method} does not exist"
     end
   end
   
-  def self.profile(&block)
-    @@profile.call &block
-  end
-  
   def self.root
-    @@gemspec_instance.root
+    @@gemspec.root
   end
   
   private
@@ -58,12 +56,14 @@ class Dep
     (File.exists?("#{path}.rb") && File.file?("#{path}.rb"))
   end
   
-  def self.require_gem!(name, overwrite_version=nil, merge_options={})
-    version, options = gem.get(name)
-    version = overwrite_version || version
-    options = options.merge(merge_options)
-    Kernel.send :gem, name.to_s, version
-    require! options[:require]
+  def self.require_gem!(name, overwrite_version=nil, overwrite_dsl=nil)
+    gem = get(:gem, name)
+    if gem
+      Kernel.send :gem, name.to_s, overwrite_version || gem.version
+      (overwrite_dsl || gem.dsl).all(:require).each do |dsl|
+        require! dsl.path
+      end
+    end
   end
   
   def self.require!(paths)
@@ -77,4 +77,8 @@ class Dep
       end
     end
   end
+end
+
+def Dep(&block)
+  Dep.call &block
 end

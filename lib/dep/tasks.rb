@@ -1,6 +1,6 @@
 desc "Package gem"
-Rake::GemPackageTask.new(Dep.gemspec_instance) do |pkg|
-  pkg.gem_spec = Dep.gemspec_instance
+Rake::GemPackageTask.new(Dep.instance) do |pkg|
+  pkg.gem_spec = Dep.instance
 end
 
 desc "Install gem"

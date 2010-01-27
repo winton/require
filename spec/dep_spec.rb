@@ -3,15 +3,14 @@ require "#{File.dirname(__FILE__)}/spec_helper"
 describe Dep do
   
   before(:all) do
-    Dep.gem do
-      rake '=0.8.7'
-      rspec '=1.3.0', :require => 'spec'
-    end
-    
-    Dep.profile do
-      rakefile :require => 'test' do
-        rake :require => %w(rake/gempackagetask)
-        rspec '>1.2.9', :require => %w(spec/rake/spectask)
+    Dep do
+      gem :rake, '=0.8.7'
+      gem(:rspec, '=1.3.0') { require 'spec' }
+      
+      rakefile do
+        require 'test'
+        gem(:rake) { require 'rake/gempackagetask' }
+        gem(:rspec, '>1.2.9') { require 'spec/rake/spectask' }
       end
     end
   end
@@ -20,6 +19,13 @@ describe Dep do
     Kernel.should_receive(:gem).with('rspec', '=1.3.0')
     Dep.should_receive(:require!).with('spec')
     Dep.send :require_gem!, :rspec
+  end
+  
+  it "should provide a require_gem! method with optional overwrite methods" do
+    Kernel.should_receive(:gem).with('rspec', '>1.2.9')
+    Dep.should_receive(:require!).with('spec/rake/spectask')
+    dsl = Dep.get(:rakefile).get(:gem, :rspec).last
+    Dep.send :require_gem!, :rspec, '>1.2.9', dsl
   end
   
   it "should provide a require! method" do
@@ -34,8 +40,8 @@ describe Dep do
   
   it "should require profiles through the bang shortcut" do
     Dep.should_receive(:require!).with('test')
-    Dep.should_receive(:require_gem!).with(:rake, nil, { :require => [ 'rake/gempackagetask' ]})
-    Dep.should_receive(:require_gem!).with(:rspec, '>1.2.9', { :require => [ 'spec/rake/spectask' ]})
+    Dep.should_receive(:require_gem!).with(:rake, nil, [[:require, "rake/gempackagetask"]])
+    Dep.should_receive(:require_gem!).with(:rspec, '>1.2.9', [[:require, "spec/rake/spectask"]])
     Dep.rakefile!
   end
 end

@@ -31,39 +31,34 @@ class Dep
         :require_path => 'lib'
       }
       
-      options = %w(
-        author
-        email
-        executables
-        extra_rdoc_files
-        files
-        has_rdoc
-        homepage
-        name
-        platform
-        summary
-        version
-      )
-      
       ::Gem::Specification.new do |s|
-        options.each do |option|
-          option = option.intern
-          s.send "#{option}=", Dep.gemspec.get(option, 0) || defaults[option]
+        Dep.get(:gemspec).all.each do |(option, value)|
+          case option
+          when :dependencies then
+            value.all(:gem).each do |dependency|
+              gem = Dep.get(:gem, dependency.name)
+              version = dependency.version || (gem.version rescue nil)
+              s.add_dependency(dependency.name.to_s, version)
+            end
+          else
+            if s.respond_to?("#{option}=")
+              s.send "#{option}=", value || defaults[option]
+              defaults[option] = nil
+            end
+          end
         end
-        
-        version, options, children = Dep.profile.get(:gemspec)
-        children.each do |name, (overwrite_version, merge_options)|
-          s.add_dependency(name.to_s, overwrite_version || Dep.gem.get(name, 0))
+        defaults.each do |option, value|
+          s.send("#{option}=", value) if value
         end
       end
     end
     
     def name
-      Dep.gemspec.get(:name, 0)
+      Dep.get(:gemspec).get(:name)[1] rescue nil
     end
     
     def root
-      Dep.gemspec.get(:root, 0)
+      Dep.get(:gemspec).get(:root)[1] rescue nil
     end
   end
 end
