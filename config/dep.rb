@@ -20,10 +20,4 @@ Dep do
     gem(:rspec) { require 'spec/rake/spectask' }
     require 'lib/dep/tasks'
   end
-  
-  spec_helper do
-    require 'lib/dep/spec_helper'
-    require 'lib/dep'
-    require 'pp'
-  end
 end

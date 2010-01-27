@@ -8,7 +8,7 @@ class Dep
   @@gemspec = Gemspec.new
   
   def self.call(&block)
-    @@dsl.call(&block) if block_given?
+    @@dsl.call &block
   end
   
   def self.instance
