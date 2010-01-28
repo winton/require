@@ -8,17 +8,21 @@ class Require
   @@gemspec = Gemspec.new
   @@root = nil
   
+  def self.all(*args)
+    @@dsl.all *args
+  end
+  
   def self.call(root=nil, &block)
     @@root = File.expand_path(root) if root
     @@dsl.call &block
   end
   
-  def self.instance
-    @@gemspec.instance
-  end
-  
   def self.get(*args)
     @@dsl.get *args
+  end
+  
+  def self.instance
+    @@gemspec.instance
   end
   
   def self.name
