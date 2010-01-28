@@ -31,10 +31,12 @@ class Dep
       profile = get(method)
       if profile
         profile.dsl.each do |dsl|
-          if dsl.require?
-            require! dsl.path
-          elsif dsl.gem?
+          if dsl.gem?
             require_gem! dsl.name, dsl.version, dsl.dsl
+          elsif dsl.load_path?
+            load_path! dsl.path
+          elsif dsl.require?
+            require! dsl.path
           end
         end
       elsif gem
@@ -60,6 +62,22 @@ class Dep
   def self.file_exists?(path)
     (File.exists?(path) && File.file?(path)) ||
     (File.exists?("#{path}.rb") && File.file?("#{path}.rb"))
+  end
+  
+  def self.dir_exists?(path)
+    File.exists?(path) && File.directory?(path)
+  end
+  
+  def self.load_path!(paths)
+    return unless paths
+    [ paths ].flatten.each do |path|
+      path_with_root = "#{root}/#{path}"
+      if root && dir_exists?(path_with_root)
+        $: << path_with_root
+      else
+        $: << path
+      end
+    end
   end
   
   def self.require_gem!(name, overwrite_version=nil, overwrite_dsl=nil)

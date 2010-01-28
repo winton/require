@@ -57,12 +57,16 @@ class Dep
         self[0] == :gem
       end
       
+      def load_path?
+        self[0] == :load_path
+      end
+      
       def name
         self[1] if gem? && self[1] != dsl
       end
       
       def path
-        self[1] if require? && self[1] != dsl
+        self[1] if (require? || load_path?) && self[1] != dsl
       end
       
       def require?

@@ -12,7 +12,7 @@ Dep do
     homepage "http://github.com/winton/#{name}"
     root File.expand_path("#{File.dirname(__FILE__)}/../")
     summary "Dependency manager"
-    version '0.1.2'
+    version '0.1.3'
   end
   
   rakefile do
