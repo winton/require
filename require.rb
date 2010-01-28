@@ -10,8 +10,8 @@ Require File.dirname(__FILE__) do
     email 'mail@wintoni.us'
     name 'require'
     homepage "http://github.com/winton/#{name}"
-    summary "Dependency manager"
-    version '0.1.4'
+    summary "Manage your project's dependencies with a pretty DSL"
+    version '0.1.5'
   end
   
   rakefile do

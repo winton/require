@@ -1,7 +1,7 @@
 Require
 =======
 
-Manage multiple dependency profiles from a single file.
+Manage your project's dependencies with a pretty DSL.
 
 * Gem activation
 * Require calls
