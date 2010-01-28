@@ -44,6 +44,7 @@ Then in your library file (<code>lib/whatever.rb</code>):
 require File.expand_path("#{File.dirname(__FILE_)}/../require")
 Require.lib!
   # Activates sinatra and haml gems
+  # Requires sinatra, haml, and sass
   # Adds vendor/authlogic/lib to the load paths
   # Requires authlogic
 </pre>
