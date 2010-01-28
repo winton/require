@@ -1,13 +1,15 @@
 require 'rubygems'
-require "#{File.dirname(__FILE__)}/dep/dsl"
-require "#{File.dirname(__FILE__)}/dep/gemspec"
+require "#{File.dirname(__FILE__)}/require/dsl"
+require "#{File.dirname(__FILE__)}/require/gemspec"
 
-class Dep
+class Require
   
   @@dsl = Dsl.new
   @@gemspec = Gemspec.new
+  @@root = nil
   
-  def self.call(&block)
+  def self.call(root=nil, &block)
+    @@root = File.expand_path(root) if root
     @@dsl.call &block
   end
   
@@ -43,18 +45,18 @@ class Dep
         require_gem! gem.name
       end
     else
-      raise "Dep##{method} does not exist"
+      raise "Require##{method} does not exist"
     end
   end
   
-  def self.reset(&block)
+  def self.reset(root=nil, &block)
     @@dsl = Dsl.new
     @@gemspec = Gemspec.new
-    call &block
+    call root, &block
   end
   
   def self.root
-    @@gemspec.root
+    @@root
   end
   
   private
@@ -103,6 +105,6 @@ class Dep
   end
 end
 
-def Dep(&block)
-  Dep.call &block
+def Require(root=nil, &block)
+  Require.call root, &block
 end

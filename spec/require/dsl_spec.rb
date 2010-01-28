@@ -1,16 +1,16 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../spec_helper")
 
-class Dep
+class Require
   describe Dsl do
     
     it "should store method calls and a value, options array" do
-      dsl = Dep::Dsl.new
+      dsl = Require::Dsl.new
       dsl.call { a 1, 2, 3 }
       dsl.should == [[:a, 1, 2, 3]]
     end
     
     it "should store child blocks" do
-      dsl = Dep::Dsl.new
+      dsl = Require::Dsl.new
       dsl.call do
         a 1 do
           b 2
@@ -20,7 +20,7 @@ class Dep
     end
     
     it "should be able to retrieve a value from the block" do
-      dsl = Dep::Dsl.new
+      dsl = Require::Dsl.new
       dsl.call do
         a 1
         b a
@@ -29,7 +29,7 @@ class Dep
     end
     
     it "should provide a get method" do
-      dsl = Dep::Dsl.new
+      dsl = Require::Dsl.new
       dsl.call do
         a 1 do
           b 2
@@ -43,7 +43,7 @@ class Dep
     end
     
     it "should provide an all method" do
-      dsl = Dep::Dsl.new
+      dsl = Require::Dsl.new
       dsl.call do
         a 1
         a 2 do

@@ -2,7 +2,7 @@ $testing = true
 SPEC = File.dirname(__FILE__)
 $:.unshift File.expand_path("#{SPEC}/../lib")
 
-require 'dep'
+require 'require'
 require 'pp'
 
 # For use with rspec textmate bundle

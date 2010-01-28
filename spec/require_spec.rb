@@ -1,10 +1,10 @@
 require "#{File.dirname(__FILE__)}/spec_helper"
 
-describe Dep do
+describe Require do
   
   before(:all) do
     @fixture = File.dirname(__FILE__) + '/fixture'
-    Dep.reset do
+    Require.reset do
       gem :rake, '=0.8.7'
       gem(:rspec, '=1.3.0') { require 'spec' }
       
@@ -18,38 +18,38 @@ describe Dep do
   end
   
   it "should provide a load_path! method" do
-    Dep.send :load_path!, @fixture
+    Require.send :load_path!, @fixture
     $:.include?(@fixture).should == true
   end
   
   it "should provide a require_gem! method" do
     Kernel.should_receive(:gem).with('rspec', '=1.3.0')
-    Dep.should_receive(:require!).with('spec')
-    Dep.send :require_gem!, :rspec
+    Require.should_receive(:require!).with('spec')
+    Require.send :require_gem!, :rspec
   end
   
   it "should provide a require_gem! method with optional overwrite methods" do
     Kernel.should_receive(:gem).with('rspec', '>1.2.9')
-    Dep.should_receive(:require!).with('spec/rake/spectask')
-    dsl = Dep.get(:rakefile).get(:gem, :rspec).last
-    Dep.send :require_gem!, :rspec, '>1.2.9', dsl
+    Require.should_receive(:require!).with('spec/rake/spectask')
+    dsl = Require.get(:rakefile).get(:gem, :rspec).last
+    Require.send :require_gem!, :rspec, '>1.2.9', dsl
   end
   
   it "should provide a require! method" do
     Kernel.should_receive(:require).with('spec')
-    Dep.send :require!, 'spec'
+    Require.send :require!, 'spec'
   end
   
   it "should require gems through the bang shortcut" do
-    Dep.should_receive(:require_gem!).with(:rspec)
-    Dep.rspec!
+    Require.should_receive(:require_gem!).with(:rspec)
+    Require.rspec!
   end
   
   it "should require profiles through the bang shortcut" do
-    Dep.should_receive(:require!).with('test')
-    Dep.should_receive(:require_gem!).with(:rake, nil, [[:require, "rake/gempackagetask"]])
-    Dep.should_receive(:require_gem!).with(:rspec, '>1.2.9', [[:require, "spec/rake/spectask"]])
-    Dep.should_receive(:load_path!).with(@fixture)
-    Dep.rakefile!
+    Require.should_receive(:require!).with('test')
+    Require.should_receive(:require_gem!).with(:rake, nil, [[:require, "rake/gempackagetask"]])
+    Require.should_receive(:require_gem!).with(:rspec, '>1.2.9', [[:require, "spec/rake/spectask"]])
+    Require.should_receive(:load_path!).with(@fixture)
+    Require.rakefile!
   end
 end

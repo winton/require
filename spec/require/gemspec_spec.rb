@@ -1,10 +1,10 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../spec_helper")
 
-class Dep
+class Require
   describe Gemspec do
     
     it "should generate a valid gemspec instance" do
-      Dep.reset do
+      Require.reset "#{File.dirname(__FILE__)}/../fixture" do
         gem :rspec, '=1.3.0'
       
         gemspec do
@@ -13,9 +13,8 @@ class Dep
             gem :rspec
           end
           email 'mail@wintoni.us'
-          name 'gem_template'
+          name 'require'
           homepage "http://github.com/winton/#{name}"
-          root File.expand_path("#{File.dirname(__FILE__)}/../fixture")
           summary "summary"
           version '0.1.0'
         end
@@ -23,7 +22,7 @@ class Dep
       
       FileUtils.mkdir_p(File.expand_path("#{File.dirname(__FILE__)}/../fixture/ignore_me"))
       
-      s = Dep.instance
+      s = Require.instance
       s.authors.should == [ "Winton Welsh" ]
       s.date.should == Time.utc(Date.today.year, Date.today.mon, Date.today.mday, 8)
       s.default_executable.should == "bin"
@@ -32,8 +31,8 @@ class Dep
       s.executables.should == ["bin"]
       s.extra_rdoc_files.should == ["README.markdown"]
       s.files.should == ["bin", "bin/bin", "lib", "lib/lib.rb", "README.markdown"]
-      s.homepage.should == "http://github.com/winton/gem_template"
-      s.name.should == "gem_template"
+      s.homepage.should == "http://github.com/winton/require"
+      s.name.should == "require"
       s.require_paths.should == ["lib"]
       s.summary.should == 'summary'
     end

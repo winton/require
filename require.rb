@@ -1,23 +1,22 @@
-require File.expand_path("#{File.dirname(__FILE__)}/../lib/dep")
+require "#{File.dirname(__FILE__)}/lib/require"
 
-Dep do
+Require File.dirname(__FILE__) do
   
   gem(:rake, '=0.8.7') { require 'rake' }
-  gem(:rspec, '=1.3.0') { require 'rspec' }
+  gem(:rspec, '=1.3.0')
   
   gemspec do
     author 'Winton Welsh'
     email 'mail@wintoni.us'
-    name 'dep'
+    name 'require'
     homepage "http://github.com/winton/#{name}"
-    root File.expand_path("#{File.dirname(__FILE__)}/../")
     summary "Dependency manager"
-    version '0.1.3'
+    version '0.1.4'
   end
   
   rakefile do
     gem(:rake) { require 'rake/gempackagetask' }
     gem(:rspec) { require 'spec/rake/spectask' }
-    require 'lib/dep/tasks'
+    require 'lib/require/tasks'
   end
 end

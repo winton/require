@@ -1,4 +1,4 @@
-class Dep
+class Require
   class Gemspec
     
     def clean_paths(paths, more=nil)
@@ -21,6 +21,7 @@ class Dep
     end
     
     def instance
+      raise "Require must be called with a root path parameter" unless root
       
       defaults = {
         :executables => executables,
@@ -32,11 +33,11 @@ class Dep
       }
       
       ::Gem::Specification.new do |s|
-        Dep.get(:gemspec).all.each do |(option, value)|
+        Require.get(:gemspec).all.each do |(option, value)|
           case option
           when :dependencies then
             value.all(:gem).each do |dependency|
-              gem = Dep.get(:gem, dependency.name)
+              gem = Require.get(:gem, dependency.name)
               version = dependency.version || (gem.version rescue nil)
               s.add_dependency(dependency.name.to_s, version)
             end
@@ -54,11 +55,11 @@ class Dep
     end
     
     def name
-      Dep.get(:gemspec).get(:name)[1] rescue nil
+      Require.get(:gemspec).get(:name)[1] rescue nil
     end
     
     def root
-      Dep.get(:gemspec).get(:root)[1] rescue nil
+      Require.root
     end
   end
 end

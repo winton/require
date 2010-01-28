@@ -1,4 +1,4 @@
-class Dep
+class Require
   class Dsl < Array
     
     def all(*values)
@@ -46,7 +46,7 @@ class Dep
       end
       
       def dsl
-        self[-1] if self[-1].class == Dep::Dsl::Args || self[-1].class == Dsl
+        self[-1] if self[-1].class == Require::Dsl::Args || self[-1].class == Dsl
       end
       
       def get(*values)
