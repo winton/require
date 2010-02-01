@@ -11,7 +11,7 @@ Require File.dirname(__FILE__) do
     name 'require'
     homepage "http://github.com/winton/#{name}"
     summary "Manage your project's dependencies with a pretty DSL"
-    version '0.1.6'
+    version '0.1.7'
   end
   
   rakefile do

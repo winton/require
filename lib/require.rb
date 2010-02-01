@@ -89,7 +89,11 @@ class Require
   def self.require_gem!(name, overwrite_version=nil, overwrite_dsl=nil)
     gem = get(:gem, name)
     if gem
-      Kernel.send :gem, name.to_s, overwrite_version || gem.version
+      if overwrite_version || gem.version
+        Kernel.send :gem, name.to_s, overwrite_version || gem.version
+      else
+        Kernel.send :gem, name.to_s
+      end
       (overwrite_dsl || gem.dsl).all(:require).each do |dsl|
         require! dsl.path
       end
