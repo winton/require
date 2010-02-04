@@ -72,7 +72,7 @@ namespace :gems do
   task :install do
     Require::Tasks.set :ask_docs, :ask_sudo
     Require.all(:gem).sort { |a,b| a.name.to_s <=> b.name.to_s }.each do |dsl|
-      Require::Tasks.run "gem install #{dsl.name} -v '#{dsl.version}'"
+      Require::Tasks.run "gem install #{dsl.name}#{" -v '#{dsl.version}'" if dsl.version}"
     end
   end
 end

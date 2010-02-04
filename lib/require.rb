@@ -94,8 +94,10 @@ class Require
       else
         Kernel.send :gem, name.to_s
       end
-      (overwrite_dsl || gem.dsl).all(:require).each do |dsl|
-        require! dsl.path
+      if overwrite_dsl || gem.dsl
+        (overwrite_dsl || gem.dsl).all(:require).each do |dsl|
+          require! dsl.path
+        end
       end
     end
   end

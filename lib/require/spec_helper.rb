@@ -1,5 +1,5 @@
 $testing = true
-SPEC = File.dirname(__FILE__)
+SPEC = File.expand_path("#{Require.root}/spec")
 $:.unshift File.expand_path("#{Require.root}/lib")
 
 # For use with rspec textmate bundle
