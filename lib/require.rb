@@ -30,7 +30,7 @@ class Require
     end
   
     def name
-      Gemspec.name
+      (@gemspec[root] ||= Gemspec.new).name
     end
   
     def method_missing(method, value=nil, options=nil)
