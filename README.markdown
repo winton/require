@@ -22,9 +22,10 @@ Create <code>require.rb</code> in your project's root directory:
 
 <pre>
 require 'rubygems'
+gem 'require'
 require 'require'
 
-Require File.dirname(__FILE__) do
+Require do
 
   gem(:sinatra, '=0.9.4') { require 'sinatra/base' }
   gem(:haml, '=2.2.16') { require %w(haml sass) }
@@ -43,8 +44,11 @@ Then in your library file (<code>lib/whatever.rb</code>):
 <pre>
 require File.expand_path("#{File.dirname(__FILE_)}/../require")
 Require.lib!
-  # Activates sinatra and haml gems
-  # Requires sinatra, haml, and sass
-  # Adds vendor/authlogic/lib to the load paths
-  # Requires authlogic
 </pre>
+
+What does <code>Require.lib!</code> do?
+
+* Activates sinatra and haml gems
+* Requires sinatra, haml, and sass
+* Adds vendor/authlogic/lib to the load paths
+* Requires authlogic
