@@ -1,6 +1,6 @@
 require "#{File.dirname(__FILE__)}/lib/require"
 
-Require File.dirname(__FILE__) do
+Require do
   
   gem(:rake, '=0.8.7') { require 'rake' }
   gem(:rspec, '=1.3.0')

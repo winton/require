@@ -3,21 +3,22 @@ require "#{File.dirname(__FILE__)}/require/dsl"
 require "#{File.dirname(__FILE__)}/require/gemspec"
 
 class Require
+  
+  @dsl = {}
+  @gemspec = {}
+  
   class <<self
-    
-    @dsl = {}
   
     def all(*args)
       dsl.all *args
     end
   
     def call(&block)
-      dsl.call &block
+      dsl(true).call &block
     end
     
-    def dsl
-      @dsl[root] ||= Dsl.new
-      @dsl[root]
+    def dsl(force=false)
+      @dsl[root(force)] ||= Dsl.new
     end
   
     def get(*args)
@@ -25,7 +26,7 @@ class Require
     end
   
     def gemspec
-      Gemspec.instance
+      (@gemspec[root] ||= Gemspec.new).instance
     end
   
     def name
@@ -73,14 +74,22 @@ class Require
       call &block
     end
   
-    def root
-      path = caller.detect do |p|
-        !p.include?('/require/lib/')
+    def root(force=false)
+      paths = caller.collect do |p|
+        File.expand_path(p.split(':').first)
       end
-      path = path.split(':').first
-      paths = @dsl.keys.sort { |a,b| a.length <=> b.length }
-      path = paths.detect { |p| p[0..path.length-1] == path } || path
-      File.dirname(path)
+      path = paths.detect do |p|
+        !p.index(/\/require[-\.\d]*\/lib\//) &&
+        !p.include?('/rubygems/specification.rb') &&
+        !p.include?('/lib/rake/') && 
+        !p.include?('/lib/spec/')
+      end
+      paths = @dsl.keys.sort { |a,b| b.length <=> a.length }
+      if force
+        File.dirname(path)
+      else
+        paths.detect { |p| path[0..p.length-1] == p }
+      end
     end
   
     private
@@ -124,6 +133,6 @@ class Require
   end
 end
 
-def Require(root=nil, &block)
-  Require.call root, &block
+def Require(&block)
+  Require.call &block
 end
