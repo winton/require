@@ -46,9 +46,46 @@ require File.expand_path("#{File.dirname(__FILE_)}/../require")
 Require.lib!
 </pre>
 
-What does <code>Require.lib!</code> do?
-
 * Activates sinatra and haml gems
 * Requires sinatra, haml, and sass
 * Adds vendor/authlogic/lib to the load paths
 * Requires authlogic
+
+Gemspec
+-------
+
+You can also use <code>Require</code> to generate a <code>Gem::Specification</code> instance.
+
+<pre>
+require 'rubygems'
+gem 'require'
+require 'require'
+
+Require do
+
+  gem(:sinatra, '=0.9.4') { require 'sinatra/base' }
+
+  gemspec do
+    author 'Your Name'
+    dependencies do
+      gem :sinatra
+    end
+    email 'your@email.com'
+    name 'my_project'
+    homepage "http://github.com/your_name/#{name}"
+    summary ""
+    version '0.1.0'
+  end
+end
+</pre>
+
+Then use it in your <code>rakefile</code>:
+
+<pre>
+require File.dirname(__FILE_) + "/require"
+
+desc "Package gem"
+Rake::GemPackageTask.new(Require.gemspec) do |pkg|
+  pkg.gem_spec = Require.gemspec
+end
+</pre>
