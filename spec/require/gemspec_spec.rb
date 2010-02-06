@@ -4,7 +4,8 @@ class Require
   describe Gemspec do
     
     it "should generate a valid gemspec instance" do
-      Require.reset "#{File.dirname(__FILE__)}/../fixture" do
+      Require.stub!(:root).and_return(SPEC + "/fixture")
+      Require.reset do
         gem :rspec, '=1.3.0'
       
         gemspec do
@@ -22,7 +23,7 @@ class Require
       
       FileUtils.mkdir_p(File.expand_path("#{File.dirname(__FILE__)}/../fixture/ignore_me"))
       
-      s = Require.instance
+      s = Require.gemspec
       s.authors.should == [ "Winton Welsh" ]
       s.date.should == Time.utc(Date.today.year, Date.today.mon, Date.today.mday, 8)
       s.default_executable.should == "bin"

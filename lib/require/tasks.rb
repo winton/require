@@ -35,8 +35,8 @@ class Require
 end
 
 desc "Package gem"
-Rake::GemPackageTask.new(Require.instance) do |pkg|
-  pkg.gem_spec = Require.instance
+Rake::GemPackageTask.new(Require.gemspec) do |pkg|
+  pkg.gem_spec = Require.gemspec
 end
 
 namespace :gem do

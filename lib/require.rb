@@ -3,113 +3,122 @@ require "#{File.dirname(__FILE__)}/require/dsl"
 require "#{File.dirname(__FILE__)}/require/gemspec"
 
 class Require
+  class <<self
+    
+    @dsl = {}
   
-  @@dsl = Dsl.new
-  @@gemspec = Gemspec.new
-  @@root = nil
+    def all(*args)
+      dsl.all *args
+    end
   
-  def self.all(*args)
-    @@dsl.all *args
-  end
+    def call(&block)
+      dsl.call &block
+    end
+    
+    def dsl
+      @dsl[root] ||= Dsl.new
+      @dsl[root]
+    end
   
-  def self.call(root=nil, &block)
-    @@root = File.expand_path(root) if root
-    @@dsl.call &block
-  end
+    def get(*args)
+      dsl.get *args
+    end
   
-  def self.get(*args)
-    @@dsl.get *args
-  end
+    def gemspec
+      Gemspec.instance
+    end
   
-  def self.instance
-    @@gemspec.instance
-  end
+    def name
+      Gemspec.name
+    end
   
-  def self.name
-    @@gemspec.name
-  end
+    def method_missing(method, value=nil, options=nil)
+      method = method.to_s
+      if method.include?('!')
+        method = method.gsub!('!', '').intern
+        gem = get(:gem, method)
+        profile = get(method)
+        if profile
+          profile.dsl.each do |dsl|
+            if dsl.gem?
+              require_gem! dsl.name, dsl.version, dsl.dsl
+            elsif dsl.load_path?
+              load_path! dsl.path
+            elsif dsl.require?
+              require! dsl.path
+            end
+          end
+        elsif gem
+          require_gem! gem.name
+        end
+      else
+        raise "Require##{method} does not exist"
+      end
+    end
+    
+    def require!(paths)
+      return unless paths
+      [ paths ].flatten.each do |path|
+        path_with_root = "#{root}/#{path}"
+        if file_exists?(path_with_root)
+          Kernel.require path_with_root
+        else
+          Kernel.require path
+        end
+      end
+    end
   
-  def self.method_missing(method, value=nil, options=nil)
-    method = method.to_s
-    if method.include?('!')
-      method = method.gsub!('!', '').intern
-      gem = get(:gem, method)
-      profile = get(method)
-      if profile
-        profile.dsl.each do |dsl|
-          if dsl.gem?
-            require_gem! dsl.name, dsl.version, dsl.dsl
-          elsif dsl.load_path?
-            load_path! dsl.path
-          elsif dsl.require?
+    def reset(&block)
+      @dsl = {}
+      call &block
+    end
+  
+    def root
+      path = caller.detect do |p|
+        !p.include?('/require/lib/')
+      end
+      path = path.split(':').first
+      paths = @dsl.keys.sort { |a,b| a.length <=> b.length }
+      path = paths.detect { |p| p[0..path.length-1] == path } || path
+      File.dirname(path)
+    end
+  
+    private
+  
+    def dir_exists?(path)
+      File.exists?(path) && File.directory?(path)
+    end
+  
+    def file_exists?(path)
+      (File.exists?(path) && File.file?(path)) ||
+      (File.exists?("#{path}.rb") && File.file?("#{path}.rb"))
+    end
+  
+    def load_path!(paths)
+      return unless paths
+      [ paths ].flatten.each do |path|
+        path_with_root = "#{root}/#{path}"
+        if root && dir_exists?(path_with_root)
+          $: << path_with_root
+        else
+          $: << path
+        end
+      end
+    end
+  
+    def require_gem!(name, overwrite_version=nil, overwrite_dsl=nil)
+      gem = get(:gem, name)
+      if gem
+        if overwrite_version || gem.version
+          Kernel.send :gem, name.to_s, overwrite_version || gem.version
+        else
+          Kernel.send :gem, name.to_s
+        end
+        if overwrite_dsl || gem.dsl
+          (overwrite_dsl || gem.dsl).all(:require).each do |dsl|
             require! dsl.path
           end
         end
-      elsif gem
-        require_gem! gem.name
-      end
-    else
-      raise "Require##{method} does not exist"
-    end
-  end
-  
-  def self.reset(root=nil, &block)
-    @@dsl = Dsl.new
-    @@gemspec = Gemspec.new
-    call root, &block
-  end
-  
-  def self.root
-    @@root
-  end
-  
-  private
-  
-  def self.file_exists?(path)
-    (File.exists?(path) && File.file?(path)) ||
-    (File.exists?("#{path}.rb") && File.file?("#{path}.rb"))
-  end
-  
-  def self.dir_exists?(path)
-    File.exists?(path) && File.directory?(path)
-  end
-  
-  def self.load_path!(paths)
-    return unless paths
-    [ paths ].flatten.each do |path|
-      path_with_root = "#{root}/#{path}"
-      if root && dir_exists?(path_with_root)
-        $: << path_with_root
-      else
-        $: << path
-      end
-    end
-  end
-  
-  def self.require_gem!(name, overwrite_version=nil, overwrite_dsl=nil)
-    gem = get(:gem, name)
-    if gem
-      if overwrite_version || gem.version
-        Kernel.send :gem, name.to_s, overwrite_version || gem.version
-      else
-        Kernel.send :gem, name.to_s
-      end
-      if overwrite_dsl || gem.dsl
-        (overwrite_dsl || gem.dsl).all(:require).each do |dsl|
-          require! dsl.path
-        end
-      end
-    end
-  end
-  
-  def self.require!(paths)
-    return unless paths
-    [ paths ].flatten.each do |path|
-      path_with_root = "#{root}/#{path}"
-      if file_exists?(path_with_root)
-        Kernel.require path_with_root
-      else
-        Kernel.require path
       end
     end
   end
