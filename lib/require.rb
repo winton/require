@@ -13,12 +13,12 @@ class Require
       dsl.all *args
     end
   
-    def call(&block)
-      dsl(true).call &block
+    def call(force_root=nil, &block)
+      dsl(force_root).call &block
     end
     
-    def dsl(force=false)
-      @dsl[root(force)] ||= Dsl.new
+    def dsl(force_root=nil)
+      @dsl[root(force_root)] ||= Dsl.new
     end
   
     def get(*args)
@@ -71,28 +71,28 @@ class Require
   
     def reset(&block)
       @dsl = {}
-      call &block
+      call caller[0], &block
     end
   
-    def root(force=false)
-      paths = caller.collect do |p|
-        File.expand_path(p.split(':').first)
-      end
-      path = paths.detect do |p|
-        !p.index(/\/require[-\.\d]*\/lib\//) &&
-        !p.include?('/rubygems/specification.rb') &&
-        !p.include?('/lib/rake/') && 
-        !p.include?('/lib/spec/')
-      end
-      paths = @dsl.keys.sort { |a,b| b.length <=> a.length }
+    def root(force=nil)
       if force
-        File.dirname(path)
+        return clean_caller(force)
       else
-        paths.detect { |p| path[0..p.length-1] == p }
+        roots = @dsl.keys.sort { |a,b| b.length <=> a.length }
+        root = roots.detect do |r|
+          caller.detect do |c|
+            clean_caller(c)[0..r.length-1] == r
+          end
+        end
+        root ? root : raise("You have not executed a Require block (Require not configured)")
       end
     end
   
     private
+    
+    def clean_caller(string)
+      File.dirname(File.expand_path(string.split(':').first))
+    end
   
     def dir_exists?(path)
       File.exists?(path) && File.directory?(path)
@@ -134,5 +134,5 @@ class Require
 end
 
 def Require(&block)
-  Require.call &block
+  Require.call caller[0], &block
 end
