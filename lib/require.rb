@@ -84,7 +84,13 @@ class Require
             clean_caller(c)[0..r.length-1] == r
           end
         end
-        root ? root : raise("You have not executed a Require block (Require not configured)")
+        if root
+          root
+        elsif defined?(::Rake)
+          Rake.original_dir
+        else
+          raise("You have not executed a Require block (Require not configured)")
+        end
       end
     end
   
