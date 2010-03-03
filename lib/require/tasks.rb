@@ -14,7 +14,7 @@ class Require
         $stdout.puts "Use sudo?"
         @@use_sudo = $stdin.gets.downcase[0..0] == 'y'
       elsif types.include?(:sudo)
-        @@gen_docs = true
+        @@use_sudo = true
       elsif types.include?(:no_sudo)
         @@use_sudo = false
       end

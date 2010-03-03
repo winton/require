@@ -11,7 +11,7 @@ Require do
     name 'require'
     homepage "http://github.com/winton/#{name}"
     summary "Manage your project's dependencies with a pretty DSL"
-    version '0.2.3'
+    version '0.2.4'
   end
   
   rakefile do
