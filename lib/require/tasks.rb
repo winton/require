@@ -31,6 +31,34 @@ class Require
       $stdout.puts cmd
       system cmd
     end
+    
+    def self.install_gem(name, version = nil)
+      unless has_gem?(name, version)
+        run "gem install #{name}#{" -v '#{version}'" if version}"
+      end
+    end
+    
+    def self.has_gem?(name, version=nil)
+      if !$GEM_LIST
+        gems = {}
+        `gem list --local`.each_line do |line|
+          gems[$1.to_sym] = $2.split(/, /) if line =~ /^(.*) \(([^\)]*)\)$/
+        end
+        $GEM_LIST = gems
+      end
+      if $GEM_LIST[name.to_sym]
+        if version
+          if $GEM_LIST[name.to_sym].include?(version) 
+            $stdout.puts "Gem: #{name}:#{version} already installed, skipping"
+            return true
+          end  
+        else
+          $stdout.puts "Gem: #{name} already installed, skipping"
+          return true
+        end
+      end
+      false
+    end
   end
 end
 
@@ -68,11 +96,13 @@ task :gems do
 end
 
 namespace :gems do
-  desc "Install gem dependencies"
+  desc "Install gem dependencies, use DOCS=1|0, SUDO=1|0 to bypass prompts"
   task :install do
-    Require::Tasks.set :ask_docs, :ask_sudo
+    doc_me = ENV['DOCS'].nil? ? :ask_docs : (ENV['DOCS'] == "1" ? :docs : :no_docs)
+    sudo_me = ENV['SUDO'].nil? ? :ask_sudo : (ENV['SUDO'] == "1" ? :sudo : :no_sudo)
+    Require::Tasks.set doc_me, sudo_me
     Require.all(:gem).sort { |a,b| a.name.to_s <=> b.name.to_s }.each do |dsl|
-      Require::Tasks.run "gem install #{dsl.name}#{" -v '#{dsl.version}'" if dsl.version}"
+      Require::Tasks.install_gem dsl.name, dsl.version
     end
   end
 end

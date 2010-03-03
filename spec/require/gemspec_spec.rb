@@ -25,7 +25,7 @@ class Require
       
       s = Require.gemspec
       s.authors.should == [ "Winton Welsh" ]
-      s.date.should == Time.utc(Date.today.year, Date.today.mon, Date.today.mday, 8)
+      s.date.should == Time.utc(Time.now.year, Time.now.mon, Time.now.mday, 8)
       s.default_executable.should == "bin"
       s.dependencies.should == [Gem::Dependency.new("rspec", Gem::Requirement.new(["= 1.3.0"]), :runtime)]
       s.email.should == 'mail@wintoni.us'
