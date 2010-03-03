@@ -48,6 +48,7 @@ class Require
       end
       if $GEM_LIST[name.to_sym]
         if version
+          version = version.gsub("=",'')
           if $GEM_LIST[name.to_sym].include?(version) 
             $stdout.puts "Gem: #{name}:#{version} already installed, skipping"
             return true
