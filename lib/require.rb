@@ -124,14 +124,22 @@ class Require
     def require_gem!(name, overwrite_version=nil, overwrite_dsl=nil)
       gem = get(:gem, name)
       if gem
-        if overwrite_version || gem.version
-          Kernel.send :gem, name.to_s, overwrite_version || gem.version
-        else
-          Kernel.send :gem, name.to_s
-        end
-        if overwrite_dsl || gem.dsl
-          (overwrite_dsl || gem.dsl).all(:require).each do |dsl|
-            require! dsl.path
+        begin
+          if overwrite_version || gem.version
+            Kernel.send :gem, name.to_s, overwrite_version || gem.version
+          else
+            Kernel.send :gem, name.to_s
+          end
+          if overwrite_dsl || gem.dsl
+            (overwrite_dsl || gem.dsl).all(:require).each do |dsl|
+              require! dsl.path
+            end
+          end
+        rescue Exception => e
+          if overwrite_version || gem.version
+            $stdout.puts "Gem #{name} (#{overwrite_version || gem.version}) could not be activated"
+          else
+            $stdout.puts "Gem #{name} could not be activated"
           end
         end
       end
