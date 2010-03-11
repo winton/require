@@ -108,8 +108,10 @@ namespace :gems do
   end
 end
 
-desc "Run specs"
-Spec::Rake::SpecTask.new do |t|
-  t.spec_opts = ["--format", "specdoc", "--colour"]
-  t.spec_files = Dir["#{Require.root}/spec/**/*_spec.rb"]
+if defined?(Spec)
+  desc "Run specs"
+  Spec::Rake::SpecTask.new do |t|
+    t.spec_opts = ["--format", "specdoc", "--colour"]
+    t.spec_files = Dir["#{Require.root}/spec/**/*_spec.rb"]
+  end
 end
