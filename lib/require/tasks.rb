@@ -63,11 +63,6 @@ class Require
   end
 end
 
-desc "Package gem"
-Rake::GemPackageTask.new(Require.gemspec) do |pkg|
-  pkg.gem_spec = Require.gemspec
-end
-
 namespace :gem do
   desc "Install gem"
   task :install do
@@ -108,7 +103,14 @@ namespace :gems do
   end
 end
 
-if defined?(Spec)
+if defined?(Rake::GemPackageTask)
+  desc "Package gem"
+  Rake::GemPackageTask.new(Require.gemspec) do |pkg|
+    pkg.gem_spec = Require.gemspec
+  end
+end
+
+if defined?(Spec::Rake::SpecTask)
   desc "Run specs"
   Spec::Rake::SpecTask.new do |t|
     t.spec_opts = ["--format", "specdoc", "--colour"]
